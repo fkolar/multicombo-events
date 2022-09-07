@@ -3,6 +3,7 @@ import {MobileModeConfig} from "@fundamental-ngx/core";
 import {MultiComboboxSelectionChangeEvent} from "@fundamental-ngx/platform";
 import {HttpClient} from "@angular/common/http";
 import {User} from "./domain/ model/user.mode";
+import {UserDataSource} from "./domain/ds/users.ds";
 
 @Component({
   selector: 'app-root',
@@ -34,7 +35,7 @@ export class AppComponent implements OnInit {
   };
 
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient, public userDataSource: UserDataSource) {
   }
 
 
