@@ -1,6 +1,6 @@
 import {User} from "../ model/user.mode";
 import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
+import {debounceTime, distinctUntilChanged, filter, Observable, tap} from "rxjs";
 import {BaseDataProvider} from "@fundamental-ngx/platform";
 import {Injectable} from "@angular/core";
 
@@ -16,7 +16,7 @@ export class UserDataProvider extends BaseDataProvider<User> {
 
   override fetch(params: Map<string, any>): Observable<User[]> {
     console.log('Fetch Called: ', params)
-    this.values =  this.httpClient.get<User[]>("assets/data.json");
+    this.values = this.httpClient.get<User[]>("assets/data.json");
     return super.fetch(params);
   }
 }

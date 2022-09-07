@@ -2,7 +2,9 @@
 
 <fdp-form-group [noLabelLayout]="false">
   <fdp-form-field id="mobile" label="Mobile Mode Combobox">
-    <fdp-multi-combobox
+    <fdp-multi-combobox #combo
+      id="users11"
+      name="users"
       placeholder="Type some text..."
       displayKey="fullName"
       [dataSource]="userDataSource"

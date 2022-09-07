@@ -1,9 +1,7 @@
-import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
-import {MobileModeConfig} from "@fundamental-ngx/core";
-import {MultiComboboxSelectionChangeEvent} from "@fundamental-ngx/platform";
-import {HttpClient} from "@angular/common/http";
-import {User} from "./domain/ model/user.mode";
+import {ChangeDetectionStrategy, Component, OnInit, ViewChild} from '@angular/core';
+import {MultiComboboxComponent, MultiComboboxSelectionChangeEvent} from "@fundamental-ngx/platform";
 import {UserDataSource} from "./domain/ds/users.ds";
+import {debounceTime, distinctUntilChanged, filter, Subject} from "rxjs";
 
 @Component({
   selector: 'app-root',
@@ -12,37 +10,45 @@ import {UserDataSource} from "./domain/ds/users.ds";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
-  dataSource = [
-    {name: 'Apple', type: 'Fruits'},
-    {name: 'Banana', type: 'Fruits'},
-    {name: 'Pineapple', type: 'Fruits'},
-    {name: 'Strawberry', type: 'Fruits'},
-    {name: 'Broccoli', type: 'Vegetables'},
-    {name: 'Carrot', type: 'Vegetables'},
-    {name: 'Jalapeño', type: 'Vegetables'},
-    {name: 'Spinach', type: 'Vegetables'}
-  ];
-
-  data: User[] = [];
-
   selectedItems = [];
 
-  mobileConfig: MobileModeConfig = {
-    title: 'Title',
-    approveButtonText: 'Save',
-    cancelButtonText: 'Cancel',
-    hasCloseButton: true
-  };
+  @ViewChild('combo', {static: true})
+  combo!: MultiComboboxComponent;
 
 
-  constructor(private httpClient: HttpClient, public userDataSource: UserDataSource) {
+  subject = new Subject()
+
+  constructor(public userDataSource: UserDataSource) {
   }
 
 
   ngOnInit() {
-    this.httpClient.get<User[]>("assets/data.json").subscribe(data => {
-      this.data = data;
+    if (this.combo) {
+      this.combo.searchTermChanged = (text: string = this.combo.inputText) => {
+        this.subject.next(text);
+        // this.userDataSource.match(map);
+        // this.combo.markForCheck();
+      };
+    }
+
+    this.subject.pipe(
+      filter(Boolean),
+      debounceTime(400),
+      distinctUntilChanged(),
+    ).subscribe((text) => {
+      console.log('My search: ', text);
+      if (text) {
+        this.combo.open();
+      }
+      const map = new Map();
+      map.set('query', text);
+      if (!this.combo.limitless) {
+        map.set('limit', this.combo.limitless);
+      }
+      this.userDataSource.match(map);
+      this.combo.markForCheck();
     })
+
   }
 
   onSelect(item: MultiComboboxSelectionChangeEvent): void {
