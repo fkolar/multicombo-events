@@ -26,8 +26,6 @@ export class AppComponent implements OnInit {
     if (this.combo) {
       this.combo.searchTermChanged = (text: string = this.combo.inputText) => {
         this.subject.next(text);
-        // this.userDataSource.match(map);
-        // this.combo.markForCheck();
       };
     }
 
